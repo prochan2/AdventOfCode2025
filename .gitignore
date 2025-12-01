@@ -360,4 +360,6 @@ MigrationBackup/
 .ionide/
 
 # Fody - auto-generated XML schema
-FodyWeavers.xsd
+
+#It is not allowed to share the input data.
+input.txt

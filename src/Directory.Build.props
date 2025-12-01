@@ -1,0 +1,12 @@
+<Project>
+
+    <PropertyGroup>
+        <Copyright>Antonín Procházka</Copyright>
+        <OutputType>Exe</OutputType>
+        <TargetFramework>net10.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+    	<ArtifactsPath>$(MSBuildThisFileDirectory)..\artifacts</ArtifactsPath>
+    </PropertyGroup>
+
+</Project>
