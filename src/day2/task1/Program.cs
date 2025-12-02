@@ -1,6 +1,4 @@
-﻿using System.Numerics;
-
-var file = File.OpenRead(GetInputFilePath(
+﻿var file = File.OpenRead(GetInputFilePath(
     //"sinput.txt"
     "input.txt"
 ));
