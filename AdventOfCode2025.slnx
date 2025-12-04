@@ -6,4 +6,5 @@
   <Project Path="src/day3/task1/Day3.Task1.csproj" />
   <Project Path="src/day3/task2/Day3.Task2.csproj" />
   <Project Path="src/day4/task1/Day4.Task1.csproj" />
+  <Project Path="src/day4/task2/Day4.Task2.csproj" />
 </Solution>
