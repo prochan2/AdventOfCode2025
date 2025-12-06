@@ -9,4 +9,5 @@
   <Project Path="src/day4/task2/Day4.Task2.csproj" />
   <Project Path="src/day5/task1/Day5.Task1.csproj" />
   <Project Path="src/day5/task2/Day5.Task2.csproj" />
+  <Project Path="src/day6/task1/Day6.Task1.csproj" />
 </Solution>
