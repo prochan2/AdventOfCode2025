@@ -6,7 +6,7 @@
 var sums = new List<long>();
 var products = new List<long>();
 
-var firstLine = true;
+var isFirstLine = true;
 var skipSpace = false;
 var i = 0;
 int c;
@@ -24,7 +24,7 @@ while ((c = file.ReadByte()) >= 0)
 
         if (!skipSpace)
         {
-            if (firstLine)
+            if (isFirstLine)
             {
                 sums.Add(currentNumber);
                 products.Add(currentNumber);
@@ -45,7 +45,7 @@ while ((c = file.ReadByte()) >= 0)
         if (c == '\n')
         {
             i = 0;
-            firstLine = false;
+            isFirstLine = false;
 
             Console.WriteLine();
         }
