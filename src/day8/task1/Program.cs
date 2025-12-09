@@ -18,7 +18,7 @@ await foreach (var line in File.ReadLinesAsync(GetInputFilePath(
 
 var circuits = new Dictionary<JunctionBox, Circuit>();
 
-for (int i = 0; i < 10; i++)
+while (true)
 {
     double minDistance = double.MaxValue;
     JunctionBox? closestJunktionBoxA = null;
@@ -38,6 +38,14 @@ for (int i = 0; i < 10; i++)
                 continue;
             }
 
+            var connectedCircuitA = circuits.GetValueOrDefault(junctionBoxA);
+            var connectedCircuitB = circuits.GetValueOrDefault(junctionBoxB);
+
+            if (connectedCircuitA != null && connectedCircuitB != null/* && connectedCircuitA == connectedCircuitB*/)
+            {
+                continue;
+            }
+
             var distance = junctionBoxA.DistanceTo(junctionBoxB);
 
             if (distance < minDistance)
@@ -49,7 +57,17 @@ for (int i = 0; i < 10; i++)
         }
     }
 
+    if (closestJunktionBoxA == null)
+    {
+        break;
+    }
+
     var junktion = Junktion.Join(closestJunktionBoxA!, closestJunktionBoxB!);
+
+    Console.WriteLine(junctionBoxes.Count + " junction boxes, joined " +
+        $"({closestJunktionBoxA!.X}, {closestJunktionBoxA!.Y}, {closestJunktionBoxA!.Z}) " +
+        $"and ({closestJunktionBoxB!.X}, {closestJunktionBoxB!.Y}, {closestJunktionBoxB!.Z}) " +
+        $"with distance {junktion.Distance}");
 
     var circuitA = circuits.GetValueOrDefault(junktion.BoxA);
     var circuitB = circuits.GetValueOrDefault(junktion.BoxB);
@@ -83,31 +101,44 @@ for (int i = 0; i < 10; i++)
     }
 }
 
-var largestCircuits = new HashSet<Circuit>();
+//var largestCircuits = new HashSet<Circuit>();
 
-for (int i = 0; i < 3; i++)
+//for (int i = 0; i < 3; i++)
+//{
+//    var largestCircuitSize = 0L;
+//    Circuit? largestCircuit = null;
+
+//    foreach (var circuit in circuits.Values)
+//    {
+//        if (largestCircuits.Contains(circuit))
+//        {
+//            continue;
+//        }
+
+//        if (circuit.Size > largestCircuitSize)
+//        {
+//            largestCircuitSize = circuit.Size;
+//            largestCircuit = circuit;
+//        }
+//    }
+
+//    largestCircuits.Add(largestCircuit ?? throw new InvalidOperationException());
+//}
+
+//Console.WriteLine(largestCircuits.Aggregate(1L, (acc, circuit) => acc * circuit.Size));
+
+var sortedCircuits = circuits.Values.ToHashSet().ToList();
+sortedCircuits.Sort((a, b) => b.Size.CompareTo(a.Size));
+foreach (var circuit in sortedCircuits)
 {
-    var largestCircuitSize = 0L;
-    Circuit? largestCircuit = null;
-
-    foreach (var circuit in circuits.Values)
-    {
-        if (largestCircuits.Contains(circuit))
-        {
-            continue;
-        }
-
-        if (circuit.Size > largestCircuitSize)
-        {
-            largestCircuitSize = circuit.Size;
-            largestCircuit = circuit;
-        }
-    }
-
-    largestCircuits.Add(largestCircuit ?? throw new InvalidOperationException());
+    Console.WriteLine(circuit.Size);
 }
 
-Console.WriteLine(largestCircuits.Aggregate(1L, (acc, circuit) => acc * circuit.Size));
+var result = sortedCircuits.Take(3).Aggregate(1L, (acc, circuit) => acc * circuit.Size);
+
+// 720 too low
+
+Console.WriteLine(result);
 
 static string GetInputFilePath(string inputFileName, [System.Runtime.CompilerServices.CallerFilePath] string? sourceCodePath = null)
 {
