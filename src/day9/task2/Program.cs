@@ -4,8 +4,8 @@ var redTiles = new LinkedList<Position>();
 var floor = new Floor();
 
 await foreach (var line in File.ReadLinesAsync(GetInputFilePath(
-    "sinput.txt"
-    //"input.txt"
+    //"sinput.txt"
+    "input.txt"
 )))
 {
     var parts = line.Split(',');
@@ -19,7 +19,15 @@ await foreach (var line in File.ReadLinesAsync(GetInputFilePath(
     redTiles.AddLast(redTile);
 }
 
-floor.FillTheBlanks();
+//for (var y = 0L; y < floor.Height; y++)
+//{
+//    for (var x = 0L; x < floor.Width; x++)
+//    {
+//        Console.Write(floor[new(x, y)] ? (redTiles.Contains(new(x, y)) ? "#" : 'X') : '.');
+//    }
+
+//    Console.WriteLine();
+//}
 
 // Find largest filled
 var incompleteRectangles = new HashSet<Rectangle>();
@@ -47,7 +55,7 @@ for (var i = redTiles.Count * redTiles.Count; i > 0; i++)
                     continue;
                 }
 
-                Console.WriteLine($"Candidate: {rectangle.Area}");
+                //Console.WriteLine($"Candidate: {rectangle.Area}");
                 largestRectangle = rectangle;
             }
         }
@@ -58,7 +66,37 @@ for (var i = redTiles.Count * redTiles.Count; i > 0; i++)
         throw new InvalidOperationException();
     }
 
-    Console.WriteLine();
+    //Console.WriteLine();
+    //Console.WriteLine($"Trying {largestRectangle.Area}:");
+
+    //for (var y = 0L; y < floor.Height; y++)
+    //{
+    //    for (var x = 0L; x < floor.Width; x++)
+    //    {
+    //        var isColored = floor[new(x, y)];
+    //        var isRed = redTiles.Contains(new(x, y));
+    //        var isCorner = largestRectangle.Corner1.X == x && largestRectangle.Corner1.Y == y
+    //            || largestRectangle.Corner2.X == x && largestRectangle.Corner2.Y == y
+    //            || largestRectangle.Corner3.X == x && largestRectangle.Corner3.Y == y
+    //            || largestRectangle.Corner4.X == x && largestRectangle.Corner4.Y == y;
+
+
+    //        Console.Write((isColored, isRed, isCorner) switch
+    //        {
+    //            (false, false, false) => '.',
+    //            (false, false, true) => '!',
+    //            (true, false, false) => 'X',
+    //            (true, true, false) => '#',
+    //            (true, true, true) => '0',
+    //            (true, false, true) => 'O',
+    //            _ => '§'
+    //        });
+    //    }
+
+    //    Console.WriteLine();
+    //}
+
+    //Console.WriteLine();
 
     bool isRectangleFullyColored =
         floor[largestRectangle.Corner1]
@@ -74,6 +112,8 @@ for (var i = redTiles.Count * redTiles.Count; i > 0; i++)
 
     break;
 }
+
+// 4560365591 too high
 
 Console.WriteLine(largestRectangle!.Area);
 
@@ -184,12 +224,12 @@ class Rectangle
 
     public override bool Equals(object? obj)
     {
-        return obj is Rectangle other && this.Corner1.Equals(other.Corner1) && this.Corner2.Equals(other.Corner2);
+        return obj is Rectangle other && this.Corner1.Equals(other.Corner1) && this.Corner3.Equals(other.Corner3);
     }
 
     public override int GetHashCode()
     {
-        return HashCode.Combine(this.Corner1.GetHashCode(), this.Corner2.GetHashCode());
+        return HashCode.Combine(this.Corner1.GetHashCode(), this.Corner3.GetHashCode());
     }
 }
 
@@ -288,9 +328,17 @@ class Floor
 
     private readonly Dictionary<long, Column> _columns = new();
 
+    public long Width => Math.Max(_columns.Values.Aggregate(0L, (width, column) => Math.Max(width, column.Last.X)),
+        _rows.Values.Aggregate(0L, (width, row) => Math.Max(width, row.Last.X))) + 1;
+
+    public long Height => Math.Max(_columns.Values.Aggregate(0L, (height, column) => Math.Max(height, column.Last.Y)),
+        _rows.Values.Aggregate(0L, (height, row) => Math.Max(height, row.Last.Y))) + 1;
+
     public bool this[Position position] =>
         (_rows.TryGetValue(position.Y, out var row) && row.IsColored(position.X))
-        || (_columns.TryGetValue(position.X, out var column) && column.IsColored(position.Y));
+        || (_columns.TryGetValue(position.X, out var column) && column.IsColored(position.Y))
+        || (_rows.Values.Any(row => row.First.Y < position.Y && row.IsColored(position.X)) && _rows.Values.Any(row => row.First.Y > position.Y && row.IsColored(position.X)))
+        || (_columns.Values.Any(column => column.First.X < position.X && column.IsColored(position.Y)) && _columns.Values.Any(column => column.First.X > position.X && column.IsColored(position.Y)));
 
     public bool Place(long x, long y) => this.Place(new(x, y));
 
@@ -319,29 +367,5 @@ class Floor
         }
 
         return anyChange;
-    }
-
-    public void FillTheBlanks()
-    {
-        var iterations = 0L;
-        bool anyChange;
-
-        do
-        {
-            anyChange = false;
-
-            foreach (var row in _rows.Values.ToArray())
-            {
-                foreach (var column in _columns.Values.ToArray())
-                {
-                    anyChange |= this.Place(row.First.X, column.First.Y);
-                    anyChange |= this.Place(row.First.X, column.Last.Y);
-                    anyChange |= this.Place(row.Last.X, column.First.Y);
-                    anyChange |= this.Place(row.Last.X, column.Last.Y);
-                }
-            }
-
-            Console.WriteLine(iterations++);
-        } while (anyChange);
     }
 }
